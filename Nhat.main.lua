@@ -302,7 +302,7 @@ end)
 
 -- 3. Tự động bật Ken ngầm
 spawn(function()
-    while wait() do
+    while wait(1) do
         pcall(function()
             if Observation then
                 ReplicatedStorage.Remotes.CommE:FireServer("Ken", true)
@@ -313,7 +313,7 @@ end)
 
 -- 4. Tự động tăng tốc thuyền (while task.wait(0.0001))
 task.spawn(function()
-    while task.wait(0.0001) do
+    while task.wait(0.01) do
         pcall(function()
             local boatsFolder = Workspace:FindFirstChild("Boats")
             if boatsFolder then
@@ -334,7 +334,7 @@ end)
 
 -- 5. Xóa hiệu ứng ánh sáng / sương mù & Chỉnh FogEnd = 9e9
 task.spawn(function()
-    while task.wait(0.001) do
+    while task.wait(0.1) do
         pcall(function()
             if Lighting:FindFirstChild("LightingLayers") then Lighting.LightingLayers:Destroy() end
             if Lighting:FindFirstChild("SeaTerrorCC") then Lighting.SeaTerrorCC:Destroy() end
