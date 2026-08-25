@@ -1,6 +1,6 @@
 _G.SEA_SPEED = 250
 _G.BOOST_SPEED = 1000 
-_G.BOOST_DISTANCE = 150
+_G.BOOST_DISTANCE = 90
 _G.DoCao = 200          
 _G.MinWaterHeight = 5   
 _G.MaxDistance = 5000   
