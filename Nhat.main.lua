@@ -327,20 +327,18 @@ spawn(function()
     end
 end)
 
--- 4. Tự động tăng tốc thuyền (while task.wait(0.0001))
+-- 4. Tự động tăng tốc tất cả các thuyền trên biển
 task.spawn(function()
-    while task.wait(0.001) do
+    while task.wait(0.01) do
         pcall(function()
             local boatsFolder = Workspace:FindFirstChild("Boats")
             if boatsFolder then
                 for _, v in pairs(boatsFolder:GetDescendants()) do
-                    if v:FindFirstChild("Owner") and tostring(v.Owner.Value) == tostring(Player.Name) then
-                        if v:FindFirstChild("VehicleSeat") then
-                            v.VehicleSeat.MaxSpeed = 300
-                            v.VehicleSeat.Torque = 0.15
-                            v.VehicleSeat.TurnSpeed = 3
-                            v.VehicleSeat.HeadsUpDisplay = true
-                        end
+                    if v:FindFirstChild("VehicleSeat") then
+                        v.VehicleSeat.MaxSpeed = 300
+                        v.VehicleSeat.Torque = 0.15
+                        v.VehicleSeat.TurnSpeed = 3
+                        v.VehicleSeat.HeadsUpDisplay = true
                     end
                 end
             end
