@@ -417,7 +417,7 @@ local function DevEsp()
                             name.Name = 'Text'
                             name.Size = UDim2.new(1, 0, 1, 0)
                             name.BackgroundTransparency = 1
-                            name.TextSize = 13
+                            name.TextSize = 9
                             name.TextColor3 = Color3.fromRGB(0, 255, 255)
                             name.TextStrokeTransparency = 0
                             name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
@@ -466,7 +466,7 @@ local function EventIslandEsp()
                                 name.Name = "Text"
                                 name.Size = UDim2.new(1, 0, 1, 0)
                                 name.BackgroundTransparency = 1
-                                name.TextSize = 13
+                                name.TextSize = 9
                                 name.TextColor3 = Color3.fromRGB(80, 245, 245)
                                 name.TextStrokeTransparency = 0
                                 name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
@@ -558,7 +558,7 @@ task.spawn(function()
                                     txt.TextColor3 = Color3.fromRGB(0, 255, 255)
                                     txt.TextStrokeTransparency = 0
                                     txt.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                                    txt.TextSize = 12
+                                    txt.TextSize = 9
                                     txt.Parent = bill
                                     
                                     bill.Parent = boatCore
