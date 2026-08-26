@@ -3,7 +3,7 @@
 -- ========================================================
 _G.SEA_SPEED = 250
 _G.BOOST_SPEED = 1000 
-_G.BOOST_DISTANCE = 90
+_G.BOOST_DISTANCE = 150
 _G.DoCao = 200          
 _G.MinWaterHeight = 5   
 _G.MaxDistance = 5000   
@@ -270,7 +270,7 @@ RunService.Heartbeat:Connect(function(DeltaTime)
     local Distance = (TargetCFrame.Position - MyRoot.Position).Magnitude
 
     -- Nếu là thuyền và đã đến gần thì tạm dừng bay để di chuyển tự do
-    if isBoat and Distance < 10 then
+    if isBoat and Distance < 5 then
         DisableAntiGravity()
         DisableNoclip()
         return
@@ -286,6 +286,9 @@ RunService.Heartbeat:Connect(function(DeltaTime)
         MyRoot.CFrame = MyRoot.CFrame:Lerp(TargetCFrame, math.clamp(StepProgress, 0, 1))
     end
 end)
+-- ========================================================
+-- CÁC TÍNH NĂNG CHẠY NGẦM TỰ ĐỘNG & BỔ SUNG
+-- ========================================================
 
 -- 1. Tự động đi trên nước ngầm
 task.spawn(function()
@@ -315,7 +318,7 @@ end)
 
 -- 3. Tự động bật Ken ngầm
 spawn(function()
-    while wait(1) do
+    while wait() do
         pcall(function()
             if Observation then
                 ReplicatedStorage.Remotes.CommE:FireServer("Ken", true)
@@ -326,7 +329,7 @@ end)
 
 -- 4. Tự động tăng tốc thuyền (while task.wait(0.0001))
 task.spawn(function()
-    while task.wait(0.01) do
+    while task.wait(0.001) do
         pcall(function()
             local boatsFolder = Workspace:FindFirstChild("Boats")
             if boatsFolder then
@@ -347,7 +350,7 @@ end)
 
 -- 5. Xóa hiệu ứng ánh sáng / sương mù & Chỉnh FogEnd = 9e9
 task.spawn(function()
-    while task.wait(0.1) do
+    while task.wait(1) do
         pcall(function()
             if Lighting:FindFirstChild("LightingLayers") then Lighting.LightingLayers:Destroy() end
             if Lighting:FindFirstChild("SeaTerrorCC") then Lighting.SeaTerrorCC:Destroy() end
@@ -391,7 +394,7 @@ task.spawn(function()
     end
 end)
 
--- 8. Tự động quét ESP Trái Ác Quỷ ngầm (Size 12, Font Cartoon, Không icon)
+-- 8. Tự động quét ESP Trái Ác Quỷ ngầm (Size 12, Font mặc định, Không icon)
 local function DevEsp()
     for _, v in ipairs(Workspace:GetChildren()) do
         pcall(function()
@@ -414,8 +417,7 @@ local function DevEsp()
                             name.Name = 'Text'
                             name.Size = UDim2.new(1, 0, 1, 0)
                             name.BackgroundTransparency = 1
-                            name.Font = Enum.Font.Cartoon
-                            name.TextSize = 12
+                            name.TextSize = 13
                             name.TextColor3 = Color3.fromRGB(0, 255, 255)
                             name.TextStrokeTransparency = 0
                             name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
@@ -440,7 +442,7 @@ task.spawn(function()
     end
 end)
 
--- 9. Tự động quét ESP Đảo Sự Kiện ngầm (Size 12, Font Cartoon, Không icon)
+-- 9. Tự động quét ESP Đảo Sự Kiện ngầm (Size 12, Font mặc định, Không icon)
 local function EventIslandEsp()
     local locationsFolder = Workspace:FindFirstChild("_WorldOrigin") and Workspace._WorldOrigin:FindFirstChild("Locations")
     if locationsFolder then
@@ -464,8 +466,7 @@ local function EventIslandEsp()
                                 name.Name = "Text"
                                 name.Size = UDim2.new(1, 0, 1, 0)
                                 name.BackgroundTransparency = 1
-                                name.Font = Enum.Font.Cartoon
-                                name.TextSize = 12
+                                name.TextSize = 13
                                 name.TextColor3 = Color3.fromRGB(80, 245, 245)
                                 name.TextStrokeTransparency = 0
                                 name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
@@ -510,6 +511,9 @@ task.spawn(function()
     end
 end)
 
+-- ========================================================
+-- HỆ THỐNG ESP THUYỀN (Size 12, Font mặc định, Không icon)
+-- ========================================================
 task.spawn(function()
     while task.wait(0.2) do
         if _G.BoatESP then
@@ -554,7 +558,6 @@ task.spawn(function()
                                     txt.TextColor3 = Color3.fromRGB(0, 255, 255)
                                     txt.TextStrokeTransparency = 0
                                     txt.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                                    txt.Font = Enum.Font.Cartoon
                                     txt.TextSize = 12
                                     txt.Parent = bill
                                     
@@ -563,7 +566,7 @@ task.spawn(function()
                                 
                                 local textLabel = bill:FindFirstChild("Text")
                                 if textLabel then
-                                    textLabel.Text = "THUYỀN CỦA TUI\n[" .. distMeters .. "m]"
+                                    textLabel.Text = "THUYỀN\n[" .. distMeters .. "m]"
                                 end
                             end
                         end
@@ -573,5 +576,3 @@ task.spawn(function()
         end
     end
 end)
-
-print("Đã tách code thành 2 đoạn hoàn tất cho ông!")
