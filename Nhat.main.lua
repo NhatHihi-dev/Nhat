@@ -1,3 +1,6 @@
+-- ========================================================
+-- PHẦN 1: CẤU HÌNH THÔNG SỐ
+-- ========================================================
 _G.SEA_SPEED = 250
 _G.BOOST_SPEED = 1000 
 _G.BOOST_DISTANCE = 90
@@ -10,17 +13,22 @@ _G.Leviathan1 = true
 _G.TerrorShark1 = true  
 _G.BoatESP = true       
 
-local Boud = true 
-local Observation = true 
-local Sec = 1 
-local DevilFruitESP = true 
-local EspEventIsland = true 
-local RDeath = true 
-_G.DestroyHit = true 
-_G.TatTBDame = false    
-local Number = math.random(1000, 9999) 
+-- Cấu hình chạy ngầm & Tính năng mới
+local Boud = true           -- Tự động bật Buso ngầm
+local Observation = true    -- Tự động bật Ken ngầm
+local Sec = 1               -- Thời gian lặp lại kiểm tra (giây)
+local DevilFruitESP = true  -- Tự động bật ESP Trái Ác Quỷ ngầm
+local EspEventIsland = true -- Tự động bật ESP Đảo Sự Kiện ngầm
+local RDeath = true         -- Tự động xóa hiệu ứng Death/Respawn
+_G.DestroyHit = true        -- Xóa hiệu ứng chém kiếm
+_G.TatTBDame = true         -- Tắt thông báo sát thương (Damage Counter)
+
+local Number = math.random(1000, 9999) -- ID ngẫu nhiên cho BillboardGui tránh trùng lặp
 
 
+-- ========================================================
+-- PHẦN 2: HỆ THỐNG CHẠY CHÍNH
+-- ========================================================
 local Players = game:GetService("Players"); local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService"); local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage"); local Lighting = game:GetService("Lighting")
@@ -128,7 +136,8 @@ local function FindMyBoat()
     return nil
 end
 
-local function FindNearestSeaEntity()
+-- Hàm tìm quái quanh đây (Sea Beast, Leviathan, Terror Shark)
+local function FindNearestSeaMonster()
     local MyRoot = GetRoot(); if not MyRoot then return nil end
     local Nearest = nil; local NearestDistance = _G.MaxDistance 
 
@@ -162,10 +171,6 @@ local function FindNearestSeaEntity()
         end
     end
     
-    if not Nearest then
-        return FindMyBoat()
-    end
-
     return Nearest
 end
 
@@ -207,7 +212,8 @@ Button.Activated:Connect(function()
     if Enabled then SetButtonOff(); return end
     
     SetButtonOn()
-    TargetEntity = FindNearestSeaEntity()
+    -- Ưu tiên tìm quái trước, nếu không có mới tìm thuyền
+    TargetEntity = FindNearestSeaMonster() or FindMyBoat()
 end)
 
 RunService.Heartbeat:Connect(function(DeltaTime)
@@ -224,12 +230,19 @@ RunService.Heartbeat:Connect(function(DeltaTime)
         return 
     end
 
-    if TargetEntity and TargetEntity.Parent then
-        if TargetEntity:IsA("Model") and not IsEntityAlive(TargetEntity) then
-            TargetEntity = FindNearestSeaEntity()
-        end
+    -- LUÔN ƯU TIÊN KIỂM TRA QUÁI MỚI SPAWN HOẶC QUÁI CŨ CÒN SỐNG
+    local currentMonster = FindNearestSeaMonster()
+    if currentMonster then
+        TargetEntity = currentMonster -- Nếu có quái xuất hiện, đổi mục tiêu ngay lập tức sang quái
     else
-        TargetEntity = FindNearestSeaEntity()
+        -- Nếu không có quái quanh đây thì kiểm tra xem Target hiện tại có phải là quái chết chưa, nếu chết rồi thì chuyển sang tìm thuyền
+        if TargetEntity and TargetEntity.Parent then
+            if TargetEntity:IsA("Model") and not IsEntityAlive(TargetEntity) then
+                TargetEntity = FindMyBoat()
+            end
+        else
+            TargetEntity = FindMyBoat()
+        end
     end
 
     if not TargetEntity then 
@@ -256,8 +269,8 @@ RunService.Heartbeat:Connect(function(DeltaTime)
     local TargetCFrame = CFrame.new(targetPos)
     local Distance = (TargetCFrame.Position - MyRoot.Position).Magnitude
 
-    -- NẾU LÀ THUYỀN VÀ ĐÃ ĐẾN GẦN (DƯỚI 10 STUDS) -> TẠM DỪNG BAY ĐỂ ÔNG DI CHUYỂN
-    if isBoat and Distance < 5 then
+    -- Nếu là thuyền và đã đến gần thì tạm dừng bay để di chuyển tự do
+    if isBoat and Distance < 10 then
         DisableAntiGravity()
         DisableNoclip()
         return
