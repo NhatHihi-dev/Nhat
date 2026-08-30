@@ -348,7 +348,7 @@ end)
 
 -- 5. Xóa hiệu ứng ánh sáng / sương mù & Chỉnh FogEnd = 9e9
 task.spawn(function()
-    while task.wait(1) do
+    while task.wait(2) do
         pcall(function()
             if Lighting:FindFirstChild("LightingLayers") then Lighting.LightingLayers:Destroy() end
             if Lighting:FindFirstChild("SeaTerrorCC") then Lighting.SeaTerrorCC:Destroy() end
@@ -415,7 +415,7 @@ local function DevEsp()
                             name.Name = 'Text'
                             name.Size = UDim2.new(1, 0, 1, 0)
                             name.BackgroundTransparency = 1
-                            name.TextSize = 9
+                            name.TextSize = 14
                             name.TextColor3 = Color3.fromRGB(0, 255, 255)
                             name.TextStrokeTransparency = 0
                             name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
@@ -423,7 +423,7 @@ local function DevEsp()
                         
                         local textLabel = bill:FindFirstChild('Text')
                         if textLabel then
-                            textLabel.Text = "[" .. v.Name .. "]\n[" .. distMeters .. "m]"
+                            textLabel.Text = v.Name .. "\n" .. distMeters .. "m"
                         end
                     end
                 end
@@ -440,7 +440,7 @@ task.spawn(function()
     end
 end)
 
--- 9. Tự động quét ESP Đảo Sự Kiện ngầm (Size 12, Font mặc định, Không icon)
+-- 9. Tự động quét ESP Đảo Sự Kiện ngầm (Size 12, Font mặc định, Không icon, Không dấu [ ])
 local function EventIslandEsp()
     local locationsFolder = Workspace:FindFirstChild("_WorldOrigin") and Workspace._WorldOrigin:FindFirstChild("Locations")
     if locationsFolder then
@@ -464,7 +464,7 @@ local function EventIslandEsp()
                                 name.Name = "Text"
                                 name.Size = UDim2.new(1, 0, 1, 0)
                                 name.BackgroundTransparency = 1
-                                name.TextSize = 9
+                                name.TextSize = 14
                                 name.TextColor3 = Color3.fromRGB(80, 245, 245)
                                 name.TextStrokeTransparency = 0
                                 name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
@@ -472,7 +472,7 @@ local function EventIslandEsp()
                             
                             local textLabel = bill:FindFirstChild("Text")
                             if textLabel then
-                                textLabel.Text = "[" .. v.Name .. "]\n[" .. distMeters .. "m]"
+                                textLabel.Text = v.Name .. "\n" .. distMeters .. "m"
                             end
                         end
                     end
@@ -485,7 +485,6 @@ local function EventIslandEsp()
         end
     end
 end
-
 task.spawn(function()
     while task.wait(0.5) do
         if EspEventIsland then
@@ -506,6 +505,31 @@ task.spawn(function()
                 end
             end
         end)
+    end
+end)
+
+-- 11. Tự động xóa vật liệu Slate trong phạm vi 100 studs
+task.spawn(function()
+    while true do
+        pcall(function()
+            local character = Player.Character
+            if character then
+                local rootPart = character:FindFirstChild("HumanoidRootPart")
+                if rootPart then
+                    local playerPos = rootPart.Position
+                    
+                    for _, v in pairs(Workspace:GetDescendants()) do
+                        if v:IsA("BasePart") and v.Material == Enum.Material.Slate then
+                            local distance = (v.Position - playerPos).Magnitude
+                            if distance <= 100 then
+                                v:Destroy()
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+        task.wait(0.1)
     end
 end)
 
@@ -556,7 +580,7 @@ task.spawn(function()
                                     txt.TextColor3 = Color3.fromRGB(0, 255, 255)
                                     txt.TextStrokeTransparency = 0
                                     txt.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                                    txt.TextSize = 9
+                                    txt.TextSize = 14
                                     txt.Parent = bill
                                     
                                     bill.Parent = boatCore
