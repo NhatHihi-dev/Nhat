@@ -521,7 +521,7 @@ workspace.DescendantAdded:Connect(function(v)
             if rootPart then
                 local distance = (v.Position - rootPart.Position).Magnitude
 
-                if distance <= 150 then
+                if distance <= 700 then
                     v:Destroy()
                 end
             end
