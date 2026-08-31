@@ -415,7 +415,7 @@ local function DevEsp()
                             name.Name = 'Text'
                             name.Size = UDim2.new(1, 0, 1, 0)
                             name.BackgroundTransparency = 1
-                            name.TextSize = 14
+                            name.TextSize = 9
                             name.TextColor3 = Color3.fromRGB(0, 255, 255)
                             name.TextStrokeTransparency = 0
                             name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
@@ -464,7 +464,7 @@ local function EventIslandEsp()
                                 name.Name = "Text"
                                 name.Size = UDim2.new(1, 0, 1, 0)
                                 name.BackgroundTransparency = 1
-                                name.TextSize = 14
+                                name.TextSize = 9
                                 name.TextColor3 = Color3.fromRGB(80, 245, 245)
                                 name.TextStrokeTransparency = 0
                                 name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
@@ -521,7 +521,7 @@ task.spawn(function()
                     for _, v in pairs(Workspace:GetDescendants()) do
                         if v:IsA("BasePart") and v.Material == Enum.Material.Slate then
                             local distance = (v.Position - playerPos).Magnitude
-                            if distance <= 100 then
+                            if distance <= 150 then
                                 v:Destroy()
                             end
                         end
@@ -529,7 +529,7 @@ task.spawn(function()
                 end
             end
         end)
-        task.wait(0.1)
+        task.wait(0.3)
     end
 end)
 
@@ -580,7 +580,7 @@ task.spawn(function()
                                     txt.TextColor3 = Color3.fromRGB(0, 255, 255)
                                     txt.TextStrokeTransparency = 0
                                     txt.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                                    txt.TextSize = 14
+                                    txt.TextSize = 9
                                     txt.Parent = bill
                                     
                                     bill.Parent = boatCore
