@@ -521,21 +521,15 @@ task.spawn(function()
                     for _, v in pairs(Workspace:GetDescendants()) do
                         if v:IsA("BasePart") and v.Material == Enum.Material.Slate then
                             local distance = (v.Position - playerPos).Magnitude
-                            if distance <= 150 then
-                                if v.CanCollide then
-                                    v.CanCollide = false
-                                end
-                                -- Nếu vẫn kẹt, tạm thời ẩn hoặc không cho tương tác
-                                if v.Transparency < 0.5 then
-                                    v.Transparency = 1 -- Làm mờ nhẹ để dễ nhận biết, hoặc chỉnh thành 1 nếu muốn tàng hình luôn
-                                end
+                            if distance <= 200 then
+                                v:Destroy()
                             end
                         end
                     end
                 end
             end
         end)
-        task.wait(0.25)
+        task.wait(0.3)
     end
 end)
 
