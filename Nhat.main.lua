@@ -508,29 +508,24 @@ task.spawn(function()
     end
 end)
 
--- 11. Tự động xóa vật liệu Slate trong phạm vi 100 studs
+-- 11. Tự động chặn và tắt va chạm vật liệu Slate ngay từ lúc game load
 task.spawn(function()
-    while true do
+    -- Xử lý các vật thể Slate đã có sẵn trong game trước đó
+    pcall(function()
+        for _, v in pairs(Workspace:GetDescendants()) do
+            if v:IsA("BasePart") and v.Material == Enum.Material.Slate then
+                v.CanCollide = false
+            end
+        end
+    end)
+
+    Workspace.DescendantAdded:Connect(function(v)
         pcall(function()
-            local character = Player.Character
-            if character then
-                local rootPart = character:FindFirstChild("HumanoidRootPart")
-                if rootPart then
-                    local playerPos = rootPart.Position
-                    
-                    for _, v in pairs(Workspace:GetDescendants()) do
-                        if v:IsA("BasePart") and v.Material == Enum.Material.Slate then
-                            local distance = (v.Position - playerPos).Magnitude
-                            if distance <= 150 then
-                                v:Destroy()
-                            end
-                        end
-                    end
-                end
+            if v:IsA("BasePart") and v.Material == Enum.Material.Slate then
+                v.CanCollide = false
             end
         end)
-        task.wait(0.3)
-    end
+    end)
 end)
 
 -- ========================================================
