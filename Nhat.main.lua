@@ -509,27 +509,23 @@ task.spawn(function()
 end)
 
 -- 11. Tự động tắt va chạm và làm trong suốt vật liệu Slate trong phạm vi 100 studs
-task.spawn(function()
-    while true do
-        pcall(function()
-            local character = Player.Character
-            if character then
-                local rootPart = character:FindFirstChild("HumanoidRootPart")
-                if rootPart then
-                    local playerPos = rootPart.Position
-                    
-                    for _, v in pairs(Workspace:GetDescendants()) do
-                        if v:IsA("BasePart") and v.Material == Enum.Material.Slate then
-                            local distance = (v.Position - playerPos).Magnitude
-                            if distance <= 200 then
-                                v:Destroy()
-                            end
-                        end
-                    end
+workspace.DescendantAdded:Connect(function(v)
+    if v:IsA("BasePart") and v.Material == Enum.Material.Slate then
+
+        task.defer(function()
+            if not v or not v.Parent then return end
+            
+            local character = player.Character
+            local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+            
+            if rootPart then
+                local distance = (v.Position - rootPart.Position).Magnitude
+
+                if distance <= 150 then
+                    v:Destroy()
                 end
             end
         end)
-        task.wait(0.3)
     end
 end)
 
