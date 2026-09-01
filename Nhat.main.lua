@@ -509,18 +509,24 @@ task.spawn(function()
 end)
 
 -- 11. Tự động tắt va chạm và làm trong suốt vật liệu Slate trong phạm vi 100 studs
-local rocks = {
+local rockNames = {
     rock1 = true,
     rock2 = true,
     rock3 = true,
-    rock4 = true
+    rock4 = true,
+    ["bloxfruit_island2_Cylinder.104"] = true
 }
 
 local function RemoveRock(obj)
-    if obj:IsA("BasePart")
-        and rocks[obj.Name]
-        and obj.Material == Enum.Material.Slate then
+    if not obj:IsA("BasePart") then
+        return
+    end
 
+    local isRock =
+        rockNames[obj.Name]
+        or obj:GetFullName():find("Meshes/bloxfruit_island2_Cylinder.104", 1, true)
+
+    if isRock and obj.Material == Enum.Material.Slate then
         obj.Size = Vector3.new(0.0001, 0.0001, 0.0001)
         obj.LocalTransparencyModifier = 1
         obj.CanCollide = false
