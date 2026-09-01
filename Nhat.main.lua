@@ -509,38 +509,33 @@ task.spawn(function()
 end)
 
 -- 11. Tự động tắt va chạm và làm trong suốt vật liệu Slate trong phạm vi 100 studs
-local function HideSlate(obj)
-    if obj:IsA("BasePart") and obj.Material == Enum.Material.Slate then
+local rocks = {
+    rock1 = true,
+    rock2 = true,
+    rock3 = true,
+    rock4 = true
+}
+
+local function RemoveRock(obj)
+    if obj:IsA("BasePart")
+        and rocks[obj.Name]
+        and obj.Material == Enum.Material.Slate then
+
+        obj.Size = Vector3.new(0.0001, 0.0001, 0.0001)
         obj.LocalTransparencyModifier = 1
         obj.CanCollide = false
         obj.CanTouch = false
+        obj.CanQuery = false
     end
 end
 
--- Xử lý Slate đang tồn tại
 for _, obj in ipairs(workspace:GetDescendants()) do
-    HideSlate(obj)
+    RemoveRock(obj)
 end
 
--- Chỉ xử lý object mới spawn
 workspace.DescendantAdded:Connect(function(obj)
-    if obj:IsA("BasePart") then
-        task.defer(function()
-            HideSlate(obj)
-        end)
-    end
-end)
-
--- Xử lý các vật thể đã có sẵn trên map trước
-for _, v in pairs(Workspace:GetDescendants()) do
-    checkAndDestroy(v)
-end
-
--- Lắng nghe khi có vật thể mới được load ra (hỗ trợ cực tốt cho StreamingEnabled)
-Workspace.DescendantAdded:Connect(function(v)
     task.defer(function()
-        task.wait(0.05)
-        checkAndDestroy(v)
+        RemoveRock(obj)
     end)
 end)
 
