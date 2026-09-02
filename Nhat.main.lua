@@ -610,3 +610,5 @@ task.spawn(function()
         end
     end
 end)
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NhatHihi-dev/Notification-Fruit/refs/heads/main/Nh%E1%BA%ADt.Notification"))()
