@@ -1,4 +1,4 @@
--- ========================================================
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NhatHihi-dev/Notification-Fruit/refs/heads/main/Nh%E1%BA%ADt.Notification"))()
 -- PHẦN 1: CẤU HÌNH THÔNG SỐ
 -- ========================================================
 _G.SEA_SPEED = 250
@@ -610,5 +610,3 @@ task.spawn(function()
         end
     end
 end)
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/NhatHihi-dev/Notification-Fruit/refs/heads/main/Nh%E1%BA%ADt.Notification"))()
