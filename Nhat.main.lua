@@ -2,8 +2,8 @@
 -- PHẦN 1: CẤU HÌNH THÔNG SỐ & HỆ THỐNG CHẠY CHÍNH
 -- ========================================================
 
-_G.SEA_SPEED = 100
-_G.BOOST_SPEED = 1000
+_G.SEA_SPEED = 250
+_G.BOOST_SPEED = 0
 _G.BOOST_DISTANCE = 90
 _G.DoCab = 200
 _G.MinWaterHeight = -5
