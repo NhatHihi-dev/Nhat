@@ -3,7 +3,7 @@
 -- ========================================================
 
 _G.SEA_SPEED = 250
-_G.BOOST_SPEED = 0
+_G.BOOST_SPEED = 250
 _G.BOOST_DISTANCE = 90
 _G.DoCab = 200
 _G.MinWaterHeight = -5
