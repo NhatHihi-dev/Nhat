@@ -1,6 +1,6 @@
--- =======================================================
+-- ========================================================
 -- PHẦN 1: CẤU HÌNH THÔNG SỐ & HỆ THỐNG CHẠY CHÍNH
--- =======================================================
+-- ========================================================
 
 _G.SEA_SPEED = 250
 _G.BOOST_SPEED = 1000
@@ -186,7 +186,7 @@ local function FindNearestSeaMonster()
         if enemiesFolder then
             for _, entity in ipairs(enemiesFolder:GetChildren()) do
                 local name = entity.Name:lower()
-                if name.find("terror") or name.find("tyrant") or name.find("golem") then
+                if name.find("terror") or name.find("shark") or name.find("piranha") then
                     if IsEntityAlive(entity) then
                         local root = entity:FindFirstChild("HumanoidRootPart") or entity:FindFirstChild("Torso") or entity.PrimaryPart
                         local distance = (root.Position - MyRoot.Position).Magnitude
@@ -241,7 +241,6 @@ Button.Activated:Connect(function()
     SetButtonOn()
     TargetEntity = FindNearestSeaMonster() or FindMyBoat()
 end)
-
 -- Vòng lặp điều hướng chính (Heartbeat)
 RunService.Heartbeat:Connect(function(DeltaTime)
     if not Enabled then
@@ -263,32 +262,27 @@ RunService.Heartbeat:Connect(function(DeltaTime)
         TargetEntity = currentMonster -- Có quái thì ưu tiên đánh quái ngay
     else
         local myBoatSeat = FindMyBoat()
-            if myBoatSeat then
-                local distToBoat = (MyRoot.Position - myBoatSeat.Position).Magnitude
-                if distToBoat > 15 then
-                    TargetEntity = myBoatSeat -- Chưa tới thì vẫn dùng BodyVelocity bay về vô lăng bình thường
-                else
-                    -- Đã tới gần vô lăng -> TẮT NGAY BodyVelocity và Noclip để nhân vật bám vào thuyền, không bị lơ lửng nữa
-                    TargetEntity = nil
-                    DisableAntiGravity()
-                    DisableNoclipping()
-                    
-                    -- Cho nhân vật dịch chuyển thẳng vào vị trí vô lăng cho chắc cú ngồi
-                    MyRoot.CFrame = myBoatSeat.CFrame + Vector3.new(0, 3, 0)
-                    task.wait(0.2) -- Chờ một nhịp ngắn ổn định
-                    
-                    -- Sau đó phóng thẳng tới tọa độ siêu xa mà không bị cản trở gì nữa
-                    local destCFrame = CFrame.new(-10000000, 31, 37016.25)
-                    local distanceToDest = (MyRoot.Position - destCFrame.Position).Magnitude
-                    
-                    if distanceToDest > 5 then
-                        local activeSpeed = _G.BOOST_SPEED
-                        local stepProgress = (activeSpeed * DeltaTime) / math.max(distanceToDest, 0.001)
-                        MyRoot.CFrame = MyRoot.CFrame:Lerp(destCFrame, math.clamp(stepProgress, 0, 1))
-                    end
-                    return
+        if myBoatSeat then
+            local distToBoat = (MyRoot.Position - myBoatSeat.Position).Magnitude
+            if distToBoat > 10 then
+                TargetEntity = myBoatSeat -- Chưa tới thuyền thì bay về vô lăng
+            else
+                -- Đã ở tại thuyền mà không có quái -> TẮT HOÀN TOÀN BodyVelocity và Noclip rồi mới phóng tới tọa độ siêu xa
+                TargetEntity = nil
+                DisableAntiGravity()
+                DisableNoclipping()
+                
+                local destCFrame = CFrame.new(-10000000, 31, 37016.25)
+                local distanceToDest = (MyRoot.Position - destCFrame.Position).Magnitude
+                
+                if distanceToDest > 5 then
+                    local activeSpeed = _G.BOOST_SPEED
+                    local stepProgress = (activeSpeed * DeltaTime) / math.max(distanceToDest, 0.001)
+                    MyRoot.CFrame = MyRoot.CFrame:Lerp(destCFrame, math.clamp(stepProgress, 0, 1))
                 end
-         else
+                return
+            end
+        else
             TargetEntity = nil
         end
     end
@@ -305,7 +299,7 @@ RunService.Heartbeat:Connect(function(DeltaTime)
         targetPos = TargetEntity.Position + Vector3.new(0, 3, 0)
         isBoat = true
     else
-        local EntityRoot = TargetEntity:FindFirstChild("HumanoidRootPart") or TargetEntity:FindFirstChild("Torso") or TargetEntity.PrimaryPart
+        local EntityRoot = TargetEntity:FindFirstChild("HumanoidRootPart") or TargetEntity:FindFirstChild("Torso") or Entity.PrimaryPart
         if not EntityRoot then return end
         local targetY = EntityRoot.Position.Y + _G.DoCab
         if EntityRoot.Position.Y < 10 then
