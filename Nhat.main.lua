@@ -186,7 +186,7 @@ local function FindNearestSeaMonster()
         if enemiesFolder then
             for _, entity in ipairs(enemiesFolder:GetChildren()) do
                 local name = entity.Name:lower()
-                if name.find("terror") or name.find("soul") or name.find("tyrant") then
+                if name.find("terror") or name.find("tyrant") or name.find("golem") then
                     if IsEntityAlive(entity) then
                         local root = entity:FindFirstChild("HumanoidRootPart") or entity:FindFirstChild("Torso") or entity.PrimaryPart
                         local distance = (root.Position - MyRoot.Position).Magnitude
@@ -268,14 +268,15 @@ RunService.Heartbeat:Connect(function(DeltaTime)
             if distToBoat > 10 then
                 TargetEntity = myBoatSeat -- Chưa tới thuyền thì bay về vô lăng
             else
-                -- Đã ở tại thuyền mà không có quái -> Phóng thẳng tới tọa độ siêu xa
+                -- Đã ở tại thuyền mà không có quái -> Tắt hoàn toàn BodyVelocity và Noclip rồi phóng tới tọa độ siêu xa
                 TargetEntity = nil
+                DisableAntiGravity()
+                DisableNoclipping()
+                
                 local destCFrame = CFrame.new(-10000000, 31, 37016.25)
                 local distanceToDest = (MyRoot.Position - destCFrame.Position).Magnitude
                 
                 if distanceToDest > 5 then
-                    EnableAntiGravity(MyRoot)
-                    EnableNoclipping()
                     local activeSpeed = _G.BOOST_SPEED
                     local stepProgress = (activeSpeed * DeltaTime) / math.max(distanceToDest, 0.001)
                     MyRoot.CFrame = MyRoot.CFrame:Lerp(destCFrame, math.clamp(stepProgress, 0, 1))
