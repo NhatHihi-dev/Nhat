@@ -1,112 +1,80 @@
 -- ========================================================
--- PHẦN 1: CẤU HÌNH THÔNG SỐ & HỆ THỐNG CHẠY CHÍNH
+-- PHẦN 1: CẤU HÌNH THÔNG SỐ
 -- ========================================================
-
-_G.SEA_SPEED = 250
-_G.BOOST_SPEED = 1000
+_G.SEA_SPEED = 170
+_G.BOOST_SPEED = 900
 _G.BOOST_DISTANCE = 90
-_G.DoCab = 200
-_G.MinWaterHeight = -5
-_G.MaxDistance = 5000
+_G.DoCao = 200          
+_G.MinWaterHeight = 5   
+_G.MaxDistance = 5000   
 
-_G.SeaBeasts1 = true
-_G.Leviathan1 = true
-_G.TerrorShark1 = true
-_G.BoatESP = true
+_G.SeaBeast1 = true     
+_G.Leviathan1 = true    
+_G.TerrorShark1 = true  
+_G.BoatESP = true       
 
--- Cấu hình chạy ngầm & Tính năng nổi
-local Boud = true
-local Observation = true
-local Sec = 1
-local DevilFruitESP = true
-local EspEventIsland = true
-local RDeath = true
-_G.DestroyHit = true
-_G.TatTBDame = true
+-- Cấu hình chạy ngầm & Tính năng mới
+local Boud = true           -- Tự động bật Buso ngầm
+local Observation = true    -- Tự động bật Ken ngầm
+local Sec = 1               -- Thời gian lặp lại kiểm tra (giây)
+local DevilFruitESP = true  -- Tự động bật ESP Trái Ác Quỷ ngầm
+local EspEventIsland = true -- Tự động bật ESP Đảo Sự Kiện ngầm
+local RDeath = true         -- Tự động xóa hiệu ứng Death/Respawn
+_G.DestroyHit = true        -- Xóa hiệu ứng chém kiếm
+_G.TatTBDame = true         -- Tắt thông báo sát thương (Damage Counter)
 
-local Number = math.random(1000, 9999)
+local Number = math.random(1000, 9999) -- ID ngẫu nhiên cho BillboardGui tránh trùng lặp
 
--- Dịch vụ hệ thống
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Lighting = game:GetService("Lighting")
 
-local Player = Players.LocalPlayer
-local PlayerGui = Player:WaitForChild("PlayerGui")
+-- ========================================================
+-- PHẦN 2: HỆ THỐNG CHẠY CHÍNH
+-- ========================================================
+local Players = game:GetService("Players"); local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService"); local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage"); local Lighting = game:GetService("Lighting")
 
--- Xóa UI cũ nếu có
+local Player = Players.LocalPlayer; local PlayerGui = Player:WaitForChild("PlayerGui")
+
 for _, oldGui in ipairs(PlayerGui:GetChildren()) do
     if oldGui.Name == "SeaBeastFlyUI_Axiom" then oldGui:Destroy() end
 end
 
-local Enabled = false
-local TargetEntity = nil
-local Dragging = false
-local DragStart, StartPosition = nil, nil
-local BodyVelocity = nil
-local NoclipConnection = nil
+local Enabled = false; local TargetEntity = nil; local Dragging = false; local DragStart = nil; local StartPosition = nil; local Moved = false
+local BodyVelocity = nil; local NoclipConnection = nil
 
--- Tạo giao diện UI nút bấm Fly
-local Gui = Instance.new("ScreenGui")
-Gui.Name = "SeaBeastFlyUI_Axiom"
-Gui.ResetOnSpawn = false
-Gui.Parent = PlayerGui
+local Gui = Instance.new("ScreenGui"); Gui.Name = "SeaBeastFlyUI_Axiom"; Gui.ResetOnSpawn = false; Gui.Parent = PlayerGui
+local Button = Instance.new("TextButton"); Button.Name = "FlyButton"; Button.Size = UDim2.fromOffset(80, 36)
+Button.Position = UDim2.new(0, 50, 0.7, 0); Button.BackgroundColor3 = Color3.fromRGB(25, 25, 35); Button.BackgroundTransparency = 0.2
+Button.TextColor3 = Color3.fromRGB(255, 255, 255); Button.TextStrokeColor3 = Color3.fromRGB(0, 150, 255); Button.TextStrokeTransparency = 0
+Button.Text = "FLY: OFF"; Button.Font = Enum.Font.Cartoon; Button.TextSize = 13; Button.BorderSizePixel = 0; Button.AutoButtonColor = false; Button.Active = true; Button.Parent = Gui
 
-local Button = Instance.new("TextButton")
-Button.Name = "FlyButton"
-Button.Size = UDim2.new(0, 80, 0, 36)
-Button.Position = UDim2.new(0, 50, 0.7, 0)
-Button.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-Button.BackgroundTransparency = 0.2
-Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-Button.TextStrokeTransparency = 0
-Button.TextStrokeColor3 = Color3.fromRGB(0, 150, 255)
-Button.Text = "FLY: OFF"
-Button.Font = Enum.Font.Cartoon
-Button.TextSize = 13
-Button.AutoButtonColor = false
-Button.Active = true
-Button.Parent = Gui
-
-local Corner = Instance.new("UICorner")
-Corner.CornerRadius = UDim.new(0, 8)
-Corner.Parent = Button
-
-local Stroke = Instance.new("UIStroke")
-Stroke.Color = Color3.fromRGB(50, 150, 255)
-Stroke.Thickness = 1.5
-Stroke.Parent = Button
+local Corner = Instance.new("UICorner"); Corner.CornerRadius = UDim.new(0, 8); Corner.Parent = Button
+local Stroke = Instance.new("UIStroke"); Stroke.Color = Color3.fromRGB(50, 150, 255); Stroke.Thickness = 1.5; Stroke.Parent = Button
 
 local function GetRoot()
-    local Character = Player.Character
-    return Character and Character:FindFirstChild("HumanoidRootPart")
+    local Character = Player.Character; return Character and Character:FindFirstChild("HumanoidRootPart")
 end
 
 local function EnableAntiGravity(root)
     if not BodyVelocity or BodyVelocity.Parent ~= root then
         if BodyVelocity then BodyVelocity:Destroy() end
-        BodyVelocity = Instance.new("BodyVelocity")
-        BodyVelocity.Name = "SeaBeastHover"
-        BodyVelocity.Velocity = Vector3.new(0, 0, 0)
-        BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-        BodyVelocity.P = 12500
-        BodyVelocity.Parent = root
+        BodyVelocity = Instance.new("BodyVelocity"); BodyVelocity.Name = "SeaBeastHover"
+        BodyVelocity.Velocity = Vector3.new(0, 0, 0); BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        BodyVelocity.P = 12500; BodyVelocity.Parent = root
     end
-    local humanoid = Player.Character and Player.Character:FindFirstChildOfClass("Humanoid")
-    if humanoid then humanoid:ChangeState(Enum.HumanoidStateType.Freefall) end
+    local Humanoid = Player.Character and Player.Character:FindFirstChildOfClass("Humanoid")
+    if Humanoid then Humanoid:ChangeState(Enum.HumanoidStateType.Freefall) end
 end
 
 local function DisableAntiGravity()
     if BodyVelocity then BodyVelocity:Destroy(); BodyVelocity = nil end
 end
 
-local function EnableNoclipping()
+local function EnableNoclip()
     if not NoclipConnection then
         NoclipConnection = RunService.Stepped:Connect(function()
             if Enabled and Player.Character then
-                for _, part in pairs(Player.Character:GetDescendants()) do
+                for _, part in ipairs(Player.Character:GetDescendants()) do
                     if part:IsA("BasePart") and part.CanCollide then part.CanCollide = false end
                 end
             end
@@ -114,24 +82,30 @@ local function EnableNoclipping()
     end
 end
 
-local function DisableNoclipping()
+local function DisableNoclip()
     if NoclipConnection then NoclipConnection:Disconnect(); NoclipConnection = nil end
 end
 
 local function IsEntityAlive(entity)
     if not entity or not entity.Parent then return false end
+    
     local health = entity:FindFirstChild("Health")
     if health and health:IsA("NumberValue") then
         if health.Value <= 0 then return false end
     end
+
     local humanoid = entity:FindFirstChildOfClass("Humanoid")
-    if humanoid and humanoid.Health <= 0 then return false end
+    if humanoid then
+        if humanoid.Health <= 0 then return false end
+    end
+
     local root = entity:FindFirstChild("HumanoidRootPart") or entity:FindFirstChild("Torso") or entity.PrimaryPart
     if not root then return false end
+
     return true
 end
 
--- Tìm thuyền của bản thân
+-- Hàm tìm thuyền của bản thân
 local function FindMyBoat()
     local boatsFolder = Workspace:FindFirstChild("Boats")
     if not boatsFolder then return nil end
@@ -162,16 +136,16 @@ local function FindMyBoat()
     return nil
 end
 
--- Tìm quái quanh đây (Sea Beast, Leviathan, Terror Shark)
+-- Hàm tìm quái quanh đây (Sea Beast, Leviathan, Terror Shark)
 local function FindNearestSeaMonster()
     local MyRoot = GetRoot(); if not MyRoot then return nil end
-    local Nearest = nil; local NearestDistance = _G.MaxDistance
-    
+    local Nearest = nil; local NearestDistance = _G.MaxDistance 
+
     local seaBeastsFolder = Workspace:FindFirstChild("SeaBeasts")
     if seaBeastsFolder then
         for _, entity in ipairs(seaBeastsFolder:GetChildren()) do
             local name = entity.Name:lower()
-            if (_G.SeaBeast1 and (name.find("sea beast") or name.find("seabeast"))) or (_G.Leviathan1 and name.find("leviathan")) then
+            if (_G.SeaBeast1 and (name:find("seabeast") or name:find("sea beast"))) or (_G.Leviathan1 and name:find("leviathan")) then
                 if IsEntityAlive(entity) then
                     local root = entity:FindFirstChild("HumanoidRootPart") or entity:FindFirstChild("Torso") or entity.PrimaryPart
                     local distance = (root.Position - MyRoot.Position).Magnitude
@@ -180,8 +154,8 @@ local function FindNearestSeaMonster()
             end
         end
     end
-    
-if _G.TerrorShark1 then
+
+    if _G.TerrorShark1 then
         local enemiesFolder = Workspace:FindFirstChild("Enemies")
         if enemiesFolder then
             for _, entity in ipairs(enemiesFolder:GetChildren()) do
@@ -201,10 +175,12 @@ if _G.TerrorShark1 then
 end
 
 local function SetButtonOff()
-    Enabled = false; TargetEntity = nil; DisableAntiGravity(); DisableNoclipping()
-    Button.Text = "FLY: OFF"
-    Stroke.Color = Color3.fromRGB(50, 150, 255)
-    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Enabled = false; TargetEntity = nil; DisableAntiGravity(); DisableNoclip()
+    if Button.Parent then 
+        Button.Text = "FLY: OFF"
+        Stroke.Color = Color3.fromRGB(50, 150, 255)
+        Button.TextColor3 = Color3.fromRGB(255, 255, 255) 
+    end
 end
 
 local function SetButtonOn()
@@ -214,7 +190,6 @@ local function SetButtonOn()
     Button.TextColor3 = Color3.fromRGB(200, 240, 255)
 end
 
--- Kéo thả UI Fly trên màn hình
 Button.InputBegan:Connect(function(Input)
     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
         Dragging = true; Moved = false; DragStart = Input.Position; StartPosition = Button.Position
@@ -229,9 +204,7 @@ UserInputService.InputChanged:Connect(function(Input)
 end)
 
 UserInputService.InputEnded:Connect(function(Input)
-    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-        Dragging = false
-    end
+    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then Dragging = false end
 end)
 
 Button.Activated:Connect(function()
@@ -239,95 +212,80 @@ Button.Activated:Connect(function()
     if Enabled then SetButtonOff(); return end
     
     SetButtonOn()
+    -- Ưu tiên tìm quái trước, nếu không có mới tìm thuyền
     TargetEntity = FindNearestSeaMonster() or FindMyBoat()
 end)
--- Vòng lặp điều hướng chính (Heartbeat)
+
 RunService.Heartbeat:Connect(function(DeltaTime)
-    if not Enabled then
+    if not Enabled then 
         DisableAntiGravity()
-        DisableNoclipping()
-        return
+        DisableNoclip()
+        return 
     end
-    
+
     local MyRoot = GetRoot()
-    if not Player.Character or not MyRoot then
+    if not Player.Character or not MyRoot then 
         DisableAntiGravity()
-        DisableNoclipping()
-        return
+        DisableNoclip()
+        return 
     end
-    
-    -- KIỂM TRA QUÁI HOẶC ĐIỀU HƯỚNG THUYỀN / TỌA ĐỘ XA
+
+    -- LUÔN ƯU TIÊN KIỂM TRA QUÁI MỚI SPAWN HOẶC QUÁI CŨ CÒN SỐNG
     local currentMonster = FindNearestSeaMonster()
     if currentMonster then
-        TargetEntity = currentMonster -- Có quái thì ưu tiên đánh quái ngay
+        TargetEntity = currentMonster -- Nếu có quái xuất hiện, đổi mục tiêu ngay lập tức sang quái
     else
-        local myBoatSeat = FindMyBoat()
-        if myBoatSeat then
-            local distToBoat = (MyRoot.Position - myBoatSeat.Position).Magnitude
-            if distToBoat > 10 then
-                TargetEntity = myBoatSeat -- Chưa tới thuyền thì bay về vô lăng
-            else
-                -- Đã ở tại thuyền mà không có quái -> TẮT HOÀN TOÀN BodyVelocity và Noclip rồi mới phóng tới tọa độ siêu xa
-                TargetEntity = nil
-                DisableAntiGravity()
-                DisableNoclipping()
-                
-                local destCFrame = CFrame.new(-10000000, 31, 37016.25)
-                local distanceToDest = (MyRoot.Position - destCFrame.Position).Magnitude
-                
-                if distanceToDest > 5 then
-                    local activeSpeed = _G.BOOST_SPEED -- Hoặc ông có thể chỉnh số nhỏ lại nếu muốn bay chậm hơn nữa
-                    local stepProgress = (activeSpeed * DeltaTime) / math.max(distanceToDest, 0.001)
-                    -- Giới hạn stepProgress lại để nó không bị vọt quá nhanh
-                    stepProgress = math.clamp(stepProgress, 0, 0.05) 
-                    MyRoot.CFrame = MyRoot.CFrame:Lerp(destCFrame, stepProgress)
-                end
-                return
+        -- Nếu không có quái quanh đây thì kiểm tra xem Target hiện tại có phải là quái chết chưa, nếu chết rồi thì chuyển sang tìm thuyền
+        if TargetEntity and TargetEntity.Parent then
+            if TargetEntity:IsA("Model") and not IsEntityAlive(TargetEntity) then
+                TargetEntity = FindMyBoat()
             end
         else
-            TargetEntity = nil
+            TargetEntity = FindMyBoat()
         end
     end
-    
-    if not TargetEntity then
+
+    if not TargetEntity then 
         DisableAntiGravity()
-        DisableNoclipping()
-        return
+        DisableNoclip()
+        return 
     end
-    
+
     local targetPos
     local isBoat = false
     if TargetEntity:IsA("BasePart") then
         targetPos = TargetEntity.Position + Vector3.new(0, 3, 0)
         isBoat = true
     else
-        local EntityRoot = TargetEntity:FindFirstChild("HumanoidRootPart") or TargetEntity:FindFirstChild("Torso") or Entity.PrimaryPart
+        local EntityRoot = TargetEntity:FindFirstChild("HumanoidRootPart") or TargetEntity:FindFirstChild("Torso") or TargetEntity.PrimaryPart
         if not EntityRoot then return end
-        local targetY = EntityRoot.Position.Y + _G.DoCab
-        if EntityRoot.Position.Y < 10 then
-            targetY = math.max(targetY, _G.MinWaterHeight + _G.DoCab)
+        local targetY = EntityRoot.Position.Y + _G.DoCao
+        if EntityRoot.Position.Y < 10 then 
+            targetY = math.max(targetY, _G.MinWaterHeight + _G.DoCao)
         end
         targetPos = Vector3.new(EntityRoot.Position.X, targetY, EntityRoot.Position.Z)
     end
-    
+
     local TargetCFrame = CFrame.new(targetPos)
     local Distance = (TargetCFrame.Position - MyRoot.Position).Magnitude
-    
-    if isBoat and Distance < 5 then
+
+    -- Nếu là thuyền và đã đến gần thì tạm dừng bay để di chuyển tự do
+    if isBoat and Distance < 10 then
         DisableAntiGravity()
-        DisableNoclipping()
+        DisableNoclip()
         return
     end
-    
+
     EnableAntiGravity(MyRoot)
-    EnableNoclipping()
-    
+    EnableNoclip()
+
     if Distance > 0.05 then
         local ActiveSpeed = _G.SEA_SPEED
+        if Distance <= _G.BOOST_DISTANCE then ActiveSpeed = _G.BOOST_SPEED end
         local StepProgress = (ActiveSpeed * DeltaTime) / math.max(Distance, 0.001)
         MyRoot.CFrame = MyRoot.CFrame:Lerp(TargetCFrame, math.clamp(StepProgress, 0, 1))
-        end
-    end)
+    end
+end)
 -- ========================================================
 -- CÁC TÍNH NĂNG CHẠY NGẦM TỰ ĐỘNG & BỔ SUNG
 -- ========================================================
