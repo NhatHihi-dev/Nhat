@@ -4,7 +4,7 @@
 
 _G.SEA_SPEED = 250
 _G.BOOST_SPEED = 250
-_G.BOOST_DISTANCE = 90
+_G.BOOST_DISTANCE = 0
 _G.DoCab = 200
 _G.MinWaterHeight = -5
 _G.MaxDistance = 5000
@@ -264,7 +264,7 @@ RunService.Heartbeat:Connect(function(DeltaTime)
         local myBoatSeat = FindMyBoat()
         if myBoatSeat then
             local distToBoat = (MyRoot.Position - myBoatSeat.Position).Magnitude
-            if distToBoat > 10 then
+            if distToBoat > 1 then
                 TargetEntity = myBoatSeat -- Chưa tới thuyền thì bay về vô lăng
             else
                 -- Đã ở tại thuyền mà không có quái -> TẮT HOÀN TOÀN BodyVelocity và Noclip rồi mới phóng tới tọa độ siêu xa
