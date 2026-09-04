@@ -276,9 +276,11 @@ RunService.Heartbeat:Connect(function(DeltaTime)
                 local distanceToDest = (MyRoot.Position - destCFrame.Position).Magnitude
                 
                 if distanceToDest > 5 then
-                    local activeSpeed = _G.BOOST_SPEED
+                    local activeSpeed = _G.BOOST_SPEED -- Hoặc ông có thể chỉnh số nhỏ lại nếu muốn bay chậm hơn nữa
                     local stepProgress = (activeSpeed * DeltaTime) / math.max(distanceToDest, 0.001)
-                    MyRoot.CFrame = MyRoot.CFrame:Lerp(destCFrame, math.clamp(stepProgress, 0, 1))
+                    -- Giới hạn stepProgress lại để nó không bị vọt quá nhanh
+                    stepProgress = math.clamp(stepProgress, 0, 0.05) 
+                    MyRoot.CFrame = MyRoot.CFrame:Lerp(destCFrame, stepProgress)
                 end
                 return
             end
