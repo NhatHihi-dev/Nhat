@@ -21,7 +21,7 @@ local DevilFruitESP = true  -- Tự động bật ESP Trái Ác Quỷ ngầm
 local EspEventIsland = true -- Tự động bật ESP Đảo Sự Kiện ngầm
 local RDeath = true         -- Tự động xóa hiệu ứng Death/Respawn
 _G.DestroyHit = true        -- Xóa hiệu ứng chém kiếm
-_G.TatTBDame = true         -- Tắt thông báo sát thương (Damage Counter)
+_G.TatTBDame = true   -- Tắt thông báo sát thương (Damage Counter)
 
 local Number = math.random(1000, 9999) -- ID ngẫu nhiên cho BillboardGui tránh trùng lặp
 
@@ -155,7 +155,7 @@ local function FindNearestSeaMonster()
         end
     end
 
-    if _G.TerrorShark1 then
+if _G.TerrorShark1 then
         local enemiesFolder = Workspace:FindFirstChild("Enemies")
         if enemiesFolder then
             for _, entity in ipairs(enemiesFolder:GetChildren()) do
@@ -270,7 +270,7 @@ RunService.Heartbeat:Connect(function(DeltaTime)
     local Distance = (TargetCFrame.Position - MyRoot.Position).Magnitude
 
     -- Nếu là thuyền và đã đến gần thì tạm dừng bay để di chuyển tự do
-    if isBoat and Distance < 10 then
+    if isBoat and Distance < 5 then
         DisableAntiGravity()
         DisableNoclip()
         return
@@ -286,6 +286,7 @@ RunService.Heartbeat:Connect(function(DeltaTime)
         MyRoot.CFrame = MyRoot.CFrame:Lerp(TargetCFrame, math.clamp(StepProgress, 0, 1))
     end
 end)
+
 -- ========================================================
 -- CÁC TÍNH NĂNG CHẠY NGẦM TỰ ĐỘNG & BỔ SUNG
 -- ========================================================
