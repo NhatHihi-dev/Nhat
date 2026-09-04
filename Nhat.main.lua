@@ -326,7 +326,8 @@ RunService.Heartbeat:Connect(function(DeltaTime)
         local ActiveSpeed = _G.SEA_SPEED
         local StepProgress = (ActiveSpeed * DeltaTime) / math.max(Distance, 0.001)
         MyRoot.CFrame = MyRoot.CFrame:Lerp(TargetCFrame, math.clamp(StepProgress, 0, 1))
-     end
+        end
+    end)
 -- ========================================================
 -- CÁC TÍNH NĂNG CHẠY NGẦM TỰ ĐỘNG & BỔ SUNG
 -- ========================================================
