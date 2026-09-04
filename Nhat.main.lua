@@ -336,7 +336,7 @@ task.spawn(function()
             if boatsFolder then
                 for _, v in pairs(boatsFolder:GetDescendants()) do
                     if v:FindFirstChild("VehicleSeat") then
-                        v.VehicleSeat.MaxSpeed = 300
+                        v.VehicleSeat.MaxSpeed = 150
                         v.VehicleSeat.Torque = 0.15
                         v.VehicleSeat.TurnSpeed = 3
                         v.VehicleSeat.HeadsUpDisplay = true
