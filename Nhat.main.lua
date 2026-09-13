@@ -1,8 +1,8 @@
 -- ========================================================
 -- PHẦN 1: CẤU HÌNH THÔNG SỐ
 -- ========================================================
-_G.SEA_SPEED = 170
-_G.BOOST_SPEED = 900
+_G.SEA_SPEED = 180
+_G.BOOST_SPEED = 1000
 _G.BOOST_DISTANCE = 90
 _G.DoCao = 200          
 _G.MinWaterHeight = 5   
@@ -21,7 +21,7 @@ local DevilFruitESP = true  -- Tự động bật ESP Trái Ác Quỷ ngầm
 local EspEventIsland = true -- Tự động bật ESP Đảo Sự Kiện ngầm
 local RDeath = true         -- Tự động xóa hiệu ứng Death/Respawn
 _G.DestroyHit = true        -- Xóa hiệu ứng chém kiếm
-_G.TatTBDame = true   -- Tắt thông báo sát thương (Damage Counter)
+_G.TatTBDame = false   -- Tắt thông báo sát thương (Damage Counter)
 
 local Number = math.random(1000, 9999) -- ID ngẫu nhiên cho BillboardGui tránh trùng lặp
 
@@ -336,7 +336,7 @@ task.spawn(function()
             if boatsFolder then
                 for _, v in pairs(boatsFolder:GetDescendants()) do
                     if v:FindFirstChild("VehicleSeat") then
-                        v.VehicleSeat.MaxSpeed = 150
+                        v.VehicleSeat.MaxSpeed = 300
                         v.VehicleSeat.Torque = 0.15
                         v.VehicleSeat.TurnSpeed = 3
                         v.VehicleSeat.HeadsUpDisplay = true
