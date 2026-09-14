@@ -392,111 +392,140 @@ task.spawn(function()
         end
     end
 end)
-
--- 8. Tự động quét ESP Trái Ác Quỷ ngầm (Size 12, Font mặc định, Không icon)
-local function DevEsp()
-    for _, v in ipairs(Workspace:GetChildren()) do
-        pcall(function()
-            if DevilFruitESP then
-                if string.find(v.Name, "Fruit") and v:FindFirstChild('Handle') then
-                    local myRoot = GetRoot()
-                    if myRoot then
-                        local handle = v.Handle
-                        local bill = handle:FindFirstChild('NameEsp'..Number)
-                        local distMeters = math.floor((myRoot.Position - handle.Position).Magnitude / 10)
-                        
-                        if not bill then
-                            bill = Instance.new('BillboardGui', handle)
-                            bill.Name = 'NameEsp'..Number
-                            bill.Size = UDim2.new(0, 200, 0, 50)
-                            bill.StudsOffset = Vector3.new(0, 4, 0)
-                            bill.AlwaysOnTop = true
-                            
-                            local name = Instance.new('TextLabel', bill)
-                            name.Name = 'Text'
-                            name.Size = UDim2.new(1, 0, 1, 0)
-                            name.BackgroundTransparency = 1
-                            name.TextSize = 9
-                            name.TextColor3 = Color3.fromRGB(0, 255, 255)
-                            name.TextStrokeTransparency = 0
-                            name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                        end
-                        
-                        local textLabel = bill:FindFirstChild('Text')
-                        if textLabel then
-                            textLabel.Text = v.Name .. "\n" .. distMeters .. "m"
-                        end
-                    end
-                end
-            end
-        end)
-    end
-end
+-- ========================================================
+-- 8. ESP TRÁI ÁC QUỶ (Tách riêng Quét và Cập nhật mét)
+-- ========================================================
+local cachedFruitHandle = nil
 
 task.spawn(function()
-    while task.wait(0.5) do
+    while true do
         if DevilFruitESP then
-            pcall(DevEsp)
+            local foundHandle = nil
+            for _, v in ipairs(Workspace:GetChildren()) do
+                pcall(function()
+                    if string.find(v.Name, "Fruit") and v:FindFirstChild('Handle') then
+                        foundHandle = v.Handle
+                    end
+                end)
+                if foundHandle then break end
+            end
+            cachedFruitHandle = foundHandle
+        else
+            cachedFruitHandle = nil
         end
+        task.wait(0.2) -- Quét thưa để giữ ổn định FPS
     end
 end)
 
--- 9. Tự động quét ESP Đảo Sự Kiện ngầm (Size 12, Font mặc định, Không icon, Không dấu [ ])
-local function EventIslandEsp()
-    local locationsFolder = Workspace:FindFirstChild("_WorldOrigin") and Workspace._WorldOrigin:FindFirstChild("Locations")
-    if locationsFolder then
-        for _, v in ipairs(locationsFolder:GetChildren()) do
+task.spawn(function()
+    while true do
+        if DevilFruitESP and cachedFruitHandle and cachedFruitHandle.Parent then
             pcall(function()
-                if EspEventIsland then
-                    if v.Name == "Mirage Island" or v.Name == "Prehistoric Island" or v.Name == "Kitsune Island" or v.Name == "Frozen Dimension" then
-                        local myRoot = GetRoot()
-                        if myRoot then
-                            local bill = v:FindFirstChild("NameEsp")
-                            local distMeters = math.floor((myRoot.Position - v.Position).Magnitude / 10)
-                            
-                            if not bill then
-                                bill = Instance.new("BillboardGui", v)
-                                bill.Name = "NameEsp"
-                                bill.StudsOffset = Vector3.new(0, 5, 0)
-                                bill.Size = UDim2.new(0, 200, 0, 50)
-                                bill.AlwaysOnTop = true
-                                
-                                local name = Instance.new("TextLabel", bill)
-                                name.Name = "Text"
-                                name.Size = UDim2.new(1, 0, 1, 0)
-                                name.BackgroundTransparency = 1
-                                name.TextSize = 9
-                                name.TextColor3 = Color3.fromRGB(80, 245, 245)
-                                name.TextStrokeTransparency = 0
-                                name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                            end
-                            
-                            local textLabel = bill:FindFirstChild("Text")
-                            if textLabel then
-                                textLabel.Text = v.Name .. "\n" .. distMeters .. "m"
-                            end
-                        end
+                local myRoot = GetRoot()
+                if myRoot then
+                    local distMeters = math.floor((myRoot.Position - cachedFruitHandle.Position).Magnitude / 10)
+                    local bill = cachedFruitHandle:FindFirstChild('NameEsp'..Number)
+                    
+                    if not bill then
+                        bill = Instance.new('BillboardGui', cachedFruitHandle)
+                        bill.Name = 'NameEsp'..Number
+                        bill.Size = UDim2.new(0, 200, 0, 50)
+                        bill.StudsOffset = Vector3.new(0, 4, 0)
+                        bill.AlwaysOnTop = true
+                        
+                        local name = Instance.new('TextLabel', bill)
+                        name.Name = 'Text'
+                        name.Size = UDim2.new(1, 0, 1, 0)
+                        name.BackgroundTransparency = 1
+                        name.TextSize = 9
+                        name.TextColor3 = Color3.fromRGB(0, 255, 255)
+                        name.TextStrokeTransparency = 0
+                        name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
                     end
-                else
-                    if v:FindFirstChild("NameEsp") then
-                        v:FindFirstChild("NameEsp"):Destroy()
+                    
+                    local textLabel = bill:FindFirstChild('Text')
+                    if textLabel then
+                        textLabel.Text = cachedFruitHandle.Parent.Name .."\n".. distMeters .." m"
                     end
                 end
             end)
         end
-    end
-end
-task.spawn(function()
-    while task.wait(0.5) do
-        if EspEventIsland then
-            pcall(EventIslandEsp)
-        end
+        task.wait(0.01) -- Cập nhật số mét siêu mượt
     end
 end)
 
--- 10. Tắt thông báo sát thương (Damage Counter)
+
+-- ========================================================
+-- 9. ESP ĐẢO SỰ KIỆN (Tách riêng Quét và Cập nhật mét)
+-- ========================================================
+local cachedEventIsland = nil
+
 task.spawn(function()
-    while task.wait(Sec) do
+    while true do
+        if EspEventIsland then
+            local foundIsland = nil
+            local locationsFolder = Workspace:FindFirstChild("_WorldOrigin") and Workspace._WorldOrigin:FindFirstChild("Locations")
+            if locationsFolder then
+                for _, v in ipairs(locationsFolder:GetChildren()) do
+                    pcall(function()
+                        if v.Name == "Mirage Island" or v.Name == "Prehistoric Island" or v.Name == "Kitsune Island" or v.Name == "Frozen Dimension" then
+                            foundIsland = v
+                        end
+                    end)
+                    if foundIsland then break end
+                end
+            end
+            cachedEventIsland = foundIsland
+        else
+            cachedEventIsland = nil
+        end
+        task.wait(0.2) -- Quét thưa để tiết kiệm tài nguyên
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if EspEventIsland and cachedEventIsland and cachedEventIsland.Parent then
+            pcall(function()
+                local myRoot = GetRoot()
+                if myRoot then
+                    local distMeters = math.floor((myRoot.Position - cachedEventIsland.Position).Magnitude / 10)
+                    local bill = cachedEventIsland:FindFirstChild("NameEsp")
+                    
+                    if not bill then
+                        bill = Instance.new("BillboardGui", cachedEventIsland)
+                        bill.Name = "NameEsp"
+                        bill.StudsOffset = Vector3.new(0, 5, 0)
+                        bill.Size = UDim2.new(0, 200, 0, 50)
+                        bill.AlwaysOnTop = true
+                        
+                        local name = Instance.new("TextLabel", bill)
+                        name.Name = "Text"
+                        name.Size = UDim2.new(1, 0, 1, 0)
+                        name.BackgroundTransparency = 1
+                        name.TextSize = 9
+                        name.TextColor3 = Color3.fromRGB(80, 245, 245)
+                        name.TextStrokeTransparency = 0
+                        name.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                    end
+                    
+                    local textLabel = bill:FindFirstChild("Text")
+                    if textLabel then
+                        textLabel.Text = cachedEventIsland.Name .."\n".. distMeters .." m"
+                    end
+                end
+            end)
+        end
+        task.wait(0.01) -- Cập nhật số mét siêu mượt
+    end
+end)
+
+
+-- ========================================================
+-- 10. Tắt thông báo sát thương (Damage Counter)
+-- ========================================================
+task.spawn(function()
+    while true do
         pcall(function()
             if ReplicatedStorage:FindFirstChild("Assets") and ReplicatedStorage.Assets:FindFirstChild("GUI") and ReplicatedStorage.Assets.GUI:FindFirstChild("DamageCounter") then
                 if _G.TatTBDame then
@@ -506,10 +535,14 @@ task.spawn(function()
                 end
             end
         end)
+        task.wait(Sec)
     end
 end)
 
--- 11. Tự động tắt va chạm và làm trong suốt vật liệu Slate trong phạm vi 100 studs
+
+-- ========================================================
+-- 11. Tự động tắt va chạm và làm trong suốt vật liệu Slate phạm vi 100 studs
+-- ========================================================
 local rockNames = {
     rock1 = true,
     rock2 = true,
@@ -522,11 +555,10 @@ local function RemoveRock(obj)
     if not obj:IsA("BasePart") then
         return
     end
-
-    local isRock =
-        rockNames[obj.Name]
+    
+    local isRock = rockNames[obj.Name] 
         or obj:GetFullName():find("Meshes/bloxfruit_island2_Cylinder.104", 1, true)
-
+    
     if isRock and obj.Material == Enum.Material.Slate then
         obj.Size = Vector3.new(0.0001, 0.0001, 0.0001)
         obj.LocalTransparencyModifier = 1
@@ -546,17 +578,19 @@ workspace.DescendantAdded:Connect(function(obj)
     end)
 end)
 
+
 -- ========================================================
--- HỆ THỐNG ESP THUYỀN (Size 12, Font mặc định, Không icon)
+-- HỆ THỐNG ESP THUYỀN (Tách riêng Quét và Cập nhật mét)
 -- ========================================================
+local cachedMyBoatCore = nil
+
 task.spawn(function()
-    while task.wait(0.2) do
+    while true do
         if _G.BoatESP then
+            local foundBoatCore = nil
             pcall(function()
                 local boatsFolder = Workspace:FindFirstChild("Boats")
-                local myRoot = GetRoot()
-                
-                if boatsFolder and myRoot then
+                if boatsFolder then
                     for _, boat in ipairs(boatsFolder:GetChildren()) do
                         local isMyBoat = false
                         if boat.Name:find(Player.Name) then
@@ -574,40 +608,56 @@ task.spawn(function()
                         end
                         
                         if isMyBoat then
-                            local boatCore = boat.PrimaryPart or boat:FindFirstChild("Hull") or boat:FindFirstChild("Seat") or boat:FindFirstChildOfClass("BasePart")
-                            if boatCore then
-                                local bill = boatCore:FindFirstChild("AxiomBoatESP")
-                                local distMeters = math.floor((boatCore.Position - myRoot.Position).Magnitude / 10)
-                                
-                                if not bill then
-                                    bill = Instance.new("BillboardGui")
-                                    bill.Name = "AxiomBoatESP"
-                                    bill.Size = UDim2.new(0, 200, 0, 50)
-                                    bill.StudsOffset = Vector3.new(0, 6, 0)
-                                    bill.AlwaysOnTop = true
-                                    
-                                    local txt = Instance.new("TextLabel")
-                                    txt.Name = "Text"
-                                    txt.Size = UDim2.new(1, 0, 1, 0)
-                                    txt.BackgroundTransparency = 1
-                                    txt.TextColor3 = Color3.fromRGB(0, 255, 255)
-                                    txt.TextStrokeTransparency = 0
-                                    txt.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                                    txt.TextSize = 9
-                                    txt.Parent = bill
-                                    
-                                    bill.Parent = boatCore
-                                end
-                                
-                                local textLabel = bill:FindFirstChild("Text")
-                                if textLabel then
-                                    textLabel.Text = "THUYỀN\n[" .. distMeters .. "m]"
-                                end
-                            end
+                            foundBoatCore = boat.PrimaryPart or boat:FindFirstChild("Hull") or boat:FindFirstChild("Seat") or boat:FindFirstChildOfClass("BasePart")
+                            if foundBoatCore then break end
                         end
                     end
                 end
             end)
+            cachedMyBoatCore = foundBoatCore
+        else
+            cachedMyBoatCore = nil
         end
+        task.wait(0.2) -- Quét thưa để giữ ổn định máy
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if _G.BoatESP and cachedMyBoatCore and cachedMyBoatCore.Parent then
+            pcall(function()
+                local myRoot = GetRoot()
+                if myRoot then
+                    local distMeters = math.floor((cachedMyBoatCore.Position - myRoot.Position).Magnitude / 10)
+                    local bill = cachedMyBoatCore:FindFirstChild("AxionBoatESP")
+                    
+                    if not bill then
+                        bill = Instance.new("BillboardGui")
+                        bill.Name = "AxionBoatESP"
+                        bill.Size = UDim2.new(0, 200, 0, 50)
+                        bill.StudsOffset = Vector3.new(0, 6, 0)
+                        bill.AlwaysOnTop = true
+                        
+                        local txt = Instance.new("TextLabel")
+                        txt.Name = "Text"
+                        txt.Size = UDim2.new(1, 0, 1, 0)
+                        txt.BackgroundTransparency = 1
+                        txt.TextSize = 9
+                        txt.TextColor3 = Color3.fromRGB(0, 255, 255)
+                        txt.TextStrokeTransparency = 0
+                        txt.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                        txt.Parent = bill
+                        
+                        bill.Parent = cachedMyBoatCore
+                    end
+                    
+                    local textLabel = bill:FindFirstChild("Text")
+                    if textLabel then
+                        textLabel.Text = "THUYỀN\n".. distMeters .." m"
+                    end
+                end
+            end)
+        end
+        task.wait(0.01) -- Cập nhật số mét thuyền cực mượt
     end
 end)
