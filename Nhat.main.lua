@@ -1,7 +1,7 @@
 -- ========================================================
 -- PHẦN 1: CẤU HÌNH THÔNG SỐ
 -- ========================================================
-_G.SEA_SPEED = 200
+_G.SEA_SPEED = 180
 _G.BOOST_SPEED = 1000
 _G.BOOST_DISTANCE = 90
 _G.DoCao = 200          
@@ -160,7 +160,7 @@ local function FindNearestSeaMonster()
         if enemiesFolder then
             for _, entity in ipairs(enemiesFolder:GetChildren()) do
                 local name = entity.Name:lower()
-                if name:find("terror") or name:find("shark") or name:find("piranha") then
+                if name:find("terror") or name:find("shark") or name:find("piranha") or name:find("tyrant of the skies") or name:find("dough king") or name:find("cake prince") then
                     if IsEntityAlive(entity) then
                         local root = entity:FindFirstChild("HumanoidRootPart") or entity:FindFirstChild("Torso") or entity.PrimaryPart
                         local distance = (root.Position - MyRoot.Position).Magnitude
