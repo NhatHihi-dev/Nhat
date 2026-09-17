@@ -160,7 +160,7 @@ local function FindNearestSeaMonster()
         if enemiesFolder then
             for _, entity in ipairs(enemiesFolder:GetChildren()) do
                 local name = entity.Name:lower()
-                if name:find("terror") or name:find("shark") or name:find("piranha") or name:find("tyrant of the skies") or name:find("dough king") or name:find("cake prince") then
+                if name:find("terror") or name:find("shark") or name:find("piranha") or name:find("tyrant of the skies") or name:find("dough king") or name:find("cake prince") or name:find("lava golem") or name:find("magnetized") or name:find("overcharged magnetized") then
                     if IsEntityAlive(entity) then
                         local root = entity:FindFirstChild("HumanoidRootPart") or entity:FindFirstChild("Torso") or entity.PrimaryPart
                         local distance = (root.Position - MyRoot.Position).Magnitude
