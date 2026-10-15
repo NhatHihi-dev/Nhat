@@ -1,10 +1,10 @@
 -- ========================================================
 -- PHẦN 1: CẤU HÌNH THÔNG SỐ
 -- ========================================================
-_G.SEA_SPEED = 180
+_G.SEA_SPEED = 200
 _G.BOOST_SPEED = 1000
-_G.BOOST_DISTANCE = 90
-_G.DoCao = 200          
+_G.BOOST_DISTANCE = 100
+_G.DoCao = 100          
 _G.MinWaterHeight = 5   
 _G.MaxDistance = 2500   
 
